@@ -24,6 +24,14 @@ app.get('/blog-posts',(req,res)=>{
 })
 
 app.post('/blog-posts',(req,res)=>{
+	let reqList = ["title","content","author"]
+	let counter = 0;
+	for(prop in req.body){
+		if(!(prop == reqList[counter])){
+			res.json(`The input ${prop} is missin`);
+			counter++
+		}
+	}
 	BlogPosts.create(req.body.title,req.body.content,req.body.author);
 	res.json(BlogPosts);
 })
