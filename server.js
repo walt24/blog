@@ -28,9 +28,11 @@ app.post('/blog-posts',(req,res)=>{
 	let counter = 0;
 	for(prop in req.body){
 		if(!(prop == reqList[counter])){
-			res.json(`The input ${prop} is missin`);
-			counter++
+			console.log( ` ${reqList[counter]} - ${counter} and ${prop}`)
+			res.json(`The input ${prop} is missing`);
+			res.end();
 		}
+		counter++
 	}
 	BlogPosts.create(req.body.title,req.body.content,req.body.author);
 	res.json(BlogPosts);
@@ -42,6 +44,15 @@ app.delete('/blog-posts/:id',(req,res)=>{
 })
 
 app.put('/blog-posts/:id',(req,res)=>{
+	let reqList = ["id","title","content","author"]
+	let counter = 0;
+	for(prop in req.body){
+		if(!(prop == reqList[counter])){
+			res.json(`The input ${prop} is missin`);
+			
+		}
+		counter++
+	}
 	BlogPosts.update(req.body);
 	res.json(BlogPosts);
 })
