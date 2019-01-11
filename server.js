@@ -1,9 +1,8 @@
 const express = require('express');
 const app = express();
-const {BlogPosts} = require('./blogModel.js');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-
+const blogPosts = require('./blogModel.js')
 
 app.use(morgan('combined'));
 app.use(bodyParser.json());
@@ -13,55 +12,57 @@ app.use(bodyParser.urlencoded());
 //app.use(validatePost);
 
 
-BlogPosts.create("one","This is the first blog post","Walter Andujar",Date.now());
-BlogPosts.create("two","This is the second blog post","Walter Andujar",Date.now());
-BlogPosts.create("three","This is the third blog post","Walter Andujar",Date.now());
-BlogPosts.create("four","This is the fourth blog post","Walter Andujar",Date.now());
-BlogPosts.create("five","This is the fifth blog post","Walter Andujar",Date.now());
+
 
 app.get('/blog-posts',(req,res)=>{
-	res.json(BlogPosts.posts);
+	blogPosts.find({},(err,posts)=>{
+		if(err){
+  		console.log(err)
+  		res.send("Internal error 500");
+  	};
+		res.json(posts);
+	})
 })
 
-app.post('/blog-posts',(req,res)=>{
-	let reqList = ["title","content","author"]
+app.get('/blog-post/:id',(req,res)=>{
+	blogPosts.findById(req.params.id,(err,post)=>{
+		if(err){
+  		console.log(err)
+  		res.send("Internal error 500");
+  	};
+		res.json(post);
+	})
+})
+
+app.post('/blog-post',(req,res)=>{
+	let reqList = ["title","content","firstName","lastName"]
 	let counter = 0;
 	for(prop in req.body){
 		if(!(prop == reqList[counter])){
 			console.log( ` ${reqList[counter]} - ${counter} and ${prop}`)
 			res.json(`The input ${prop} is missing`);
-			res.end();
 		}
 		counter++
 	}
-	BlogPosts.create(req.body.title,req.body.content,req.body.author);
-	res.json(BlogPosts);
+	
+	blogPosts.create({title: req.body.title,content: req.body.content, author:{ firstName: req.body.firstName, lastName: req.body.lastName}},(err,post)=>{
+  	if(err){
+  		console.log(err)
+  		res.send("Internal error 500");
+  	};
+ 		res.json(post)
+	})
 })
 
-app.delete('/blog-posts/:id',(req,res)=>{
-	BlogPosts.delete(req.params.id);
-	res.json(BlogPosts);
+app.delete('/blog-post/:id',(req,res)=>{
+	blogPosts.deleteOne({_id: req.params.id},(err)=>{
+		if(err){
+  		console.log(err)
+  		res.send("Internal error 500");
+  	};
+		res.redirect('/blog-posts');	
+	});	
 })
-
-app.put('/blog-posts/:id',(req,res)=>{
-	let reqList = ["id","title","content","author"]
-	let counter = 0;
-	for(prop in req.body){
-		if(!(prop == reqList[counter])){
-			res.json(`The input ${prop} is missin`);
-			
-		}
-		counter++
-	}
-	BlogPosts.update(req.body);
-	res.json(BlogPosts);
-})
-
-
-
-
-
-
 
 
 
