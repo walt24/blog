@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const author = require('./authorModel.js')
 mongoose.Promise = global.Promise;
 
 mongoose.connect("mongodb://wandujar:Woar9253@ds243441.mlab.com:43441/emailerdb",{useNewUrlParser: true});
@@ -7,10 +7,7 @@ mongoose.connect("mongodb://wandujar:Woar9253@ds243441.mlab.com:43441/emailerdb"
 const blogSchema = new mongoose.Schema({
   title: String,
   content: String,
-  author: {
-    firstName: String,
-    lastName: String
-  }
+  author: author.authorSchema
 })
 
 blogSchema.methods.fullName = function(){
